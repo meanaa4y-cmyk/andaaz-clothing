@@ -26,7 +26,7 @@ export default function Customers() {
               </div>
               <div className="text-right">
                 <span className="font-luxury font-bold text-sm text-brand-accent">
-                  ${c.totalSpent.toFixed(2)}
+                  ${Number(c.totalSpent || 0).toFixed(2)}
                 </span>
                 <span className="block text-[10px] text-stone-400">Total Spent</span>
               </div>

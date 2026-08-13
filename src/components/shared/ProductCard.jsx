@@ -40,11 +40,11 @@ export default function ProductCard({ product }) {
         <div className="flex items-center justify-between mt-4 pt-4 border-t border-brand-border">
           <div className="flex items-center space-x-2">
             <span className="font-luxury font-bold text-lg text-brand-accent">
-              ${product.price.toFixed(2)}
+              ${Number(product.price || 0).toFixed(2)}
             </span>
             {product.originalPrice && (
               <span className="text-xs text-stone-400 line-through">
-                ${product.originalPrice.toFixed(2)}
+                ${Number(product.originalPrice || 0).toFixed(2)}
               </span>
             )}
           </div>

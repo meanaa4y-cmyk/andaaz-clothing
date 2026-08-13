@@ -56,7 +56,7 @@ export default function Inventory() {
                 <div>
                   <h4 className="font-bold text-xs text-stone-900">{p.name}</h4>
                   <span className="text-[10px] text-stone-500">
-                    Cat: {p.category} &bull; Price: ${p.price.toFixed(2)}
+                    Cat: {p.category} &bull; Price: ${Number(p.price || 0).toFixed(2)}
                   </span>
                 </div>
               </div>

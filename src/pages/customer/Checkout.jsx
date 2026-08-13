@@ -133,7 +133,7 @@ export default function Checkout() {
               disabled={cart.length === 0}
               className="w-full bg-brand-primary text-white py-4 rounded-xl font-bold uppercase tracking-widest text-xs hover:bg-brand-accent hover:text-brand-primary transition shadow-md mt-4 disabled:opacity-50"
             >
-              Place Order Now (${cartTotal.toFixed(2)})
+              Place Order Now (${Number(cartTotal || 0).toFixed(2)})
             </button>
           </form>
         </div>
@@ -149,7 +149,7 @@ export default function Checkout() {
                   </span>
                 </div>
                 <span className="font-bold text-brand-accent">
-                  ${(item.price * item.qty).toFixed(2)}
+                  ${(Number(item.price || 0) * item.qty).toFixed(2)}
                 </span>
               </div>
             ))}
@@ -157,7 +157,7 @@ export default function Checkout() {
           <div className="border-t border-brand-border pt-4 space-y-2 text-xs">
             <div className="flex justify-between text-stone-600">
               <span>Subtotal</span>
-              <span>${cartTotal.toFixed(2)}</span>
+              <span>${Number(cartTotal || 0).toFixed(2)}</span>
             </div>
             <div className="flex justify-between text-stone-600">
               <span>Shipping</span>
@@ -165,7 +165,7 @@ export default function Checkout() {
             </div>
             <div className="flex justify-between font-bold text-sm text-brand-primary pt-2 border-t border-brand-border">
               <span>Total</span>
-              <span>${cartTotal.toFixed(2)}</span>
+              <span>${Number(cartTotal || 0).toFixed(2)}</span>
             </div>
           </div>
         </div>

@@ -60,7 +60,7 @@ export default function CartDrawer({ open, onClose }) {
                         Size: <span className="font-semibold">{item.size}</span>
                       </p>
                       <p className="font-luxury font-bold text-xs text-brand-accent">
-                        ${item.price.toFixed(2)}
+                        ${Number(item.price || 0).toFixed(2)}
                       </p>
                     </div>
                   </div>
@@ -90,7 +90,7 @@ export default function CartDrawer({ open, onClose }) {
               Subtotal:
             </span>
             <span className="font-luxury font-bold text-xl text-brand-primary">
-              ${cartTotal.toFixed(2)}
+              ${Number(cartTotal || 0).toFixed(2)}
             </span>
           </div>
           <button

@@ -34,7 +34,7 @@ export default function Dashboard() {
         <div className="bg-white p-6 rounded-3xl border border-stone-200 shadow-sm">
           <span className="text-xs font-bold uppercase text-stone-400">Total Revenue</span>
           <div className="font-luxury text-3xl font-bold text-stone-900 mt-2">
-            ${dashboardStats.totalRevenue.toFixed(2)}
+            ${Number(dashboardStats.totalRevenue || 0).toFixed(2)}
           </div>
           <span className="text-xs text-emerald-600 font-semibold mt-1 inline-block">
             <i className="fa-solid fa-arrow-up"></i> +14.2% this month
@@ -98,7 +98,7 @@ export default function Dashboard() {
                   <td className="p-3 font-mono font-bold">{o.id}</td>
                   <td className="p-3">{o.customer}</td>
                   <td className="p-3 text-stone-500">{o.date}</td>
-                  <td className="p-3 font-bold">${o.total.toFixed(2)}</td>
+                  <td className="p-3 font-bold">${Number(o.total || 0).toFixed(2)}</td>
                   <td className="p-3">
                     <span className="bg-amber-100 text-amber-800 px-2.5 py-1 rounded-full text-[10px] font-bold">
                       {o.status}

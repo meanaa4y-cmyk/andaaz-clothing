@@ -34,7 +34,7 @@ export default function Orders() {
                     {o.customer} ({o.email})
                   </h4>
                   <span className="text-[10px] text-stone-500">
-                    {o.date} &bull; Total: ${o.total.toFixed(2)}
+                    {o.date} &bull; Total: ${Number(o.total || 0).toFixed(2)}
                   </span>
                 </div>
                 <div className="flex items-center space-x-3">

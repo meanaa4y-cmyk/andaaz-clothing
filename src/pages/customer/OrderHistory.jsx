@@ -39,14 +39,14 @@ export default function OrderHistory() {
                     <span>
                       {i.qty}x {i.name} ({i.size})
                     </span>
-                    <span className="font-semibold">${(i.price * i.qty).toFixed(2)}</span>
+                    <span className="font-semibold">${(Number(i.price || 0) * i.qty).toFixed(2)}</span>
                   </div>
                 ))}
               </div>
               <div className="pt-4 border-t border-brand-border flex justify-between items-center text-xs font-bold">
                 <span>Total Amount</span>
                 <span className="font-luxury text-base text-brand-accent">
-                  ${ord.total.toFixed(2)}
+                  ${Number(ord.total || 0).toFixed(2)}
                 </span>
               </div>
             </div>

@@ -68,7 +68,7 @@ export default function Products() {
                       {p.category}
                     </span>
                   </td>
-                  <td className="p-3 font-semibold">${p.price.toFixed(2)}</td>
+                  <td className="p-3 font-semibold">${Number(p.price || 0).toFixed(2)}</td>
                   <td className="p-3">
                     <span className={`font-bold ${p.stock < 10 ? "text-red-600" : "text-emerald-600"}`}>
                       {p.stock} units

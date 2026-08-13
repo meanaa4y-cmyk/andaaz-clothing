@@ -57,7 +57,7 @@ export default function SearchModal({ open, onClose }) {
                 <SafeImage src={p.img} className="w-12 h-12 rounded-lg object-cover" alt={p.name} />
                 <div>
                   <h4 className="font-luxury font-bold text-xs text-brand-primary">{p.name}</h4>
-                  <p className="text-[11px] text-brand-accent font-semibold">${p.price.toFixed(2)}</p>
+                  <p className="text-[11px] text-brand-accent font-semibold">${Number(p.price || 0).toFixed(2)}</p>
                 </div>
               </div>
             ))

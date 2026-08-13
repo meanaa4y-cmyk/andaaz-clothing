@@ -46,11 +46,11 @@ export default function ProductDetail() {
             </h1>
             <div className="flex items-center space-x-3 mb-4">
               <span className="font-luxury text-2xl font-bold text-brand-accent">
-                ${p.price.toFixed(2)}
+                ${Number(p.price || 0).toFixed(2)}
               </span>
               {p.originalPrice && (
                 <span className="text-sm text-stone-400 line-through">
-                  ${p.originalPrice.toFixed(2)}
+                  ${Number(p.originalPrice || 0).toFixed(2)}
                 </span>
               )}
             </div>

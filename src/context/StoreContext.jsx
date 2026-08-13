@@ -144,7 +144,7 @@ export function StoreProvider({ children }) {
   }, []);
 
   const cartTotal = useMemo(
-    () => cart.reduce((sum, item) => sum + item.price * item.qty, 0),
+    () => cart.reduce((sum, item) => sum + Number(item.price || 0) * item.qty, 0),
     [cart]
   );
   const cartCount = useMemo(() => cart.reduce((sum, item) => sum + item.qty, 0), [cart]);
