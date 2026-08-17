@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useStore } from "../../context/StoreContext";
 
 export default function Checkout() {
-  const { cart, cartTotal, processCheckout } = useStore();
+  const { cart, cartTotal, processCheckout, currentUser } = useStore();
   const navigate = useNavigate();
   const [form, setForm] = useState({
     fname: "",
@@ -16,9 +16,13 @@ export default function Checkout() {
 
   const handleChange = (field) => (e) => setForm({ ...form, [field]: e.target.value });
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    const orderId = processCheckout(form);
+    if (!currentUser) {
+      navigate("/auth");
+      return;
+    }
+    const orderId = await processCheckout(form);
     navigate(`/confirmation/${orderId}`);
   };
 

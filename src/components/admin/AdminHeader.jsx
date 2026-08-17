@@ -2,7 +2,7 @@ import { NavLink, useNavigate } from "react-router-dom";
 import { useStore } from "../../context/StoreContext";
 
 export default function AdminHeader() {
-  const { setRole, handleLogout } = useStore();
+  const { setRole, showToast } = useStore();
   const navigate = useNavigate();
 
   const linkClass = ({ isActive }) =>
@@ -15,11 +15,14 @@ export default function AdminHeader() {
     navigate("/");
   };
 
-  const logoutAdmin = async () => {
+  const logoutAdmin = () => {
+    // Only clears the admin session flag - the customer's Firebase
+    // account (if any) stays signed in, since admin and customer
+    // share the same auth session underneath.
     localStorage.removeItem("andaaz_admin_auth");
     setRole("customer");
-    await handleLogout();
-    navigate("/admin/login");
+    showToast("Logged out of admin console.");
+    navigate("/");
   };
 
   return (

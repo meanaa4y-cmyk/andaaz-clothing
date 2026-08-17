@@ -148,13 +148,6 @@ export default function ProductModal({ open, onClose, editProduct }) {
                 />
                 {uploading && <p className="text-[10px] text-stone-400">Processing image...</p>}
                 {uploadError && <p className="text-[10px] text-red-500">{uploadError}</p>}
-                <input
-                  type="url"
-                  value={form.img}
-                  onChange={(e) => setForm({ ...form, img: e.target.value })}
-                  className="w-full bg-stone-50 border border-stone-200 rounded-xl px-4 py-2 text-xs focus:outline-none focus:border-brand-accent"
-                  placeholder="or paste an image URL"
-                />
               </div>
             </div>
           </div>
