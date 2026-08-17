@@ -1,186 +1,146 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import { useStore } from "../../context/StoreContext";
-import SafeImage from "../shared/SafeImage";
-import { fileToCompressedDataUrl } from "../../utils/image";
-import ModalPortal from "../shared/ModalPortal";
+import ProductModal from "../../components/admin/ProductModal";
+import SafeImage from "../../components/shared/SafeImage";
 
-const emptyForm = { name: "", category: "Men", price: "", stock: "", img: "", desc: "" };
+const CATEGORY_OPTIONS = ["All", "Men", "Women", "Unisex"];
 
-export default function ProductModal({ open, onClose, editProduct }) {
-  const { addOrUpdateProduct } = useStore();
-  const [form, setForm] = useState(emptyForm);
-  const [uploading, setUploading] = useState(false);
-  const [uploadError, setUploadError] = useState("");
-
-  const handleFileChange = async (e) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    setUploadError("");
-    setUploading(true);
-    try {
-      const dataUrl = await fileToCompressedDataUrl(file);
-      setForm((f) => ({ ...f, img: dataUrl }));
-    } catch (err) {
-      setUploadError("Couldn't read that image. Try a different file.");
-    } finally {
-      setUploading(false);
-      e.target.value = "";
-    }
-  };
+export default function Products() {
+  const { products, deleteProduct } = useStore();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [modalOpen, setModalOpen] = useState(false);
+  const [editProduct, setEditProduct] = useState(null);
+  const [search, setSearch] = useState("");
+  const [category, setCategory] = useState("All");
 
   useEffect(() => {
-    if (editProduct) {
-      setForm({
-        name: editProduct.name,
-        category: editProduct.category,
-        price: editProduct.price,
-        stock: editProduct.stock,
-        img: editProduct.img,
-        desc: editProduct.desc,
-      });
-    } else {
-      setForm(emptyForm);
+    if (searchParams.get("add") === "1") {
+      setEditProduct(null);
+      setModalOpen(true);
+      searchParams.delete("add");
+      setSearchParams(searchParams, { replace: true });
     }
-  }, [editProduct, open]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
-  if (!open) return null;
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    addOrUpdateProduct(
-      {
-        name: form.name,
-        category: form.category,
-        price: parseFloat(form.price),
-        stock: parseInt(form.stock, 10),
-        img: form.img,
-        desc: form.desc,
-      },
-      editProduct?.id
-    );
-    onClose();
+  const openAdd = () => {
+    setEditProduct(null);
+    setModalOpen(true);
+  };
+  const openEdit = (p) => {
+    setEditProduct(p);
+    setModalOpen(true);
   };
 
+  const filtered = useMemo(() => {
+    return products.filter((p) => {
+      const matchesCategory = category === "All" || p.category === category;
+      const matchesSearch = p.name.toLowerCase().includes(search.trim().toLowerCase());
+      return matchesCategory && matchesSearch;
+    });
+  }, [products, category, search]);
+
   return (
-    <ModalPortal>
-    <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
-      <div className="bg-white w-full max-w-lg rounded-3xl p-8 shadow-2xl relative animate-fade-in max-h-[90vh] overflow-y-auto">
-        <button
-          onClick={onClose}
-          className="absolute top-6 right-6 text-stone-400 hover:text-black text-lg"
-        >
-          <i className="fa-solid fa-xmark"></i>
-        </button>
-        <h3 className="font-luxury text-2xl font-bold text-stone-900 mb-6">
-          {editProduct ? "Edit Product" : "Add New Full Product"}
-        </h3>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="block text-xs font-semibold text-stone-700 mb-1 uppercase">
-              Product Name
-            </label>
+    <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 animate-fade-in">
+      <div className="mb-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <div>
+          <span className="text-xs uppercase tracking-[0.2em] text-brand-accent font-bold">
+            Catalog Management
+          </span>
+          <h1 className="font-luxury text-3xl font-bold text-stone-900 mt-1">All Products</h1>
+        </div>
+        <div className="flex items-center space-x-3">
+          <button
+            onClick={openAdd}
+            className="bg-brand-accent text-brand-primary px-5 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider hover:bg-white transition shadow"
+          >
+            <i className="fa-solid fa-plus mr-2"></i> Add Product
+          </button>
+        </div>
+      </div>
+
+      <div className="bg-white rounded-3xl border border-stone-200 p-6 shadow-sm">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
+          <div className="relative w-full sm:w-72">
+            <i className="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-stone-400 text-xs"></i>
             <input
               type="text"
-              required
-              value={form.name}
-              onChange={(e) => setForm({ ...form, name: e.target.value })}
-              className="w-full bg-stone-50 border border-stone-200 rounded-xl px-4 py-2.5 text-xs focus:outline-none focus:border-brand-accent"
-              placeholder="Silk Velvet Sherwani"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Search products..."
+              className="w-full pl-9 pr-3 py-2.5 text-xs bg-stone-50 border border-stone-300 rounded-xl focus:outline-none focus:border-brand-accent"
             />
           </div>
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-xs font-semibold text-stone-700 mb-1 uppercase">
-                Category
-              </label>
-              <select
-                value={form.category}
-                onChange={(e) => setForm({ ...form, category: e.target.value })}
-                className="w-full bg-stone-50 border border-stone-200 rounded-xl px-4 py-2.5 text-xs focus:outline-none"
+          <div className="flex items-center space-x-2">
+            {CATEGORY_OPTIONS.map((c) => (
+              <button
+                key={c}
+                onClick={() => setCategory(c)}
+                className={`text-xs font-bold uppercase tracking-wider px-3.5 py-2 rounded-xl transition ${
+                  category === c
+                    ? "bg-stone-900 text-white"
+                    : "bg-stone-100 text-stone-600 hover:bg-stone-200"
+                }`}
               >
-                <option value="Men">Men</option>
-                <option value="Women">Women</option>
-                <option value="Unisex">Unisex</option>
-              </select>
-            </div>
-            <div>
-              <label className="block text-xs font-semibold text-stone-700 mb-1 uppercase">
-                Price ($)
-              </label>
-              <input
-                type="number"
-                step="0.01"
-                required
-                value={form.price}
-                onChange={(e) => setForm({ ...form, price: e.target.value })}
-                className="w-full bg-stone-50 border border-stone-200 rounded-xl px-4 py-2.5 text-xs focus:outline-none"
-                placeholder="290.00"
-              />
-            </div>
+                {c}
+              </button>
+            ))}
           </div>
-          <div>
-            <label className="block text-xs font-semibold text-stone-700 mb-1 uppercase">
-              Stock Qty
-            </label>
-            <input
-              type="number"
-              required
-              value={form.stock}
-              onChange={(e) => setForm({ ...form, stock: e.target.value })}
-              className="w-full bg-stone-50 border border-stone-200 rounded-xl px-4 py-2.5 text-xs focus:outline-none"
-              placeholder="15"
-            />
-          </div>
-          <div>
-            <label className="block text-xs font-semibold text-stone-700 mb-1 uppercase">
-              Product Image
-            </label>
-            <div className="flex items-center space-x-4">
-              <div className="w-20 h-20 rounded-xl overflow-hidden border border-stone-200 bg-stone-50 shrink-0">
-                <SafeImage src={form.img} alt="Preview" className="w-full h-full object-cover" />
+        </div>
+
+        {filtered.length === 0 ? (
+          <div className="text-center py-16 text-stone-400 text-sm">No products found.</div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {filtered.map((p) => (
+              <div
+                key={p.id}
+                className="flex items-center justify-between p-4 bg-stone-50 rounded-2xl border border-stone-200 gap-4"
+              >
+                <div className="flex items-center space-x-3 min-w-0">
+                  <SafeImage
+                    src={p.img}
+                    className="w-14 h-14 rounded-xl object-cover bg-stone-200 shrink-0"
+                    alt={p.name}
+                  />
+                  <div className="min-w-0">
+                    <h4 className="font-bold text-xs text-stone-900 truncate">{p.name}</h4>
+                    <span className="text-[10px] text-stone-500">
+                      {p.category} &bull; ${Number(p.price || 0).toFixed(2)}
+                    </span>
+                    <div className="mt-1">
+                      <span
+                        className={`text-[10px] font-bold px-2 py-0.5 rounded-lg ${
+                          p.stock < 10 ? "text-red-600 bg-red-50" : "text-emerald-600 bg-emerald-50"
+                        }`}
+                      >
+                        {p.stock} in stock
+                      </span>
+                    </div>
+                  </div>
+                </div>
+                <div className="flex items-center space-x-2 shrink-0">
+                  <button
+                    onClick={() => openEdit(p)}
+                    className="bg-blue-50 text-blue-700 px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-blue-100 transition"
+                  >
+                    Edit
+                  </button>
+                  <button
+                    onClick={() => deleteProduct(p.id)}
+                    className="bg-red-50 text-red-600 px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-red-100 transition"
+                  >
+                    <i className="fa-solid fa-trash"></i>
+                  </button>
+                </div>
               </div>
-              <div className="flex-1 space-y-2">
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={handleFileChange}
-                  className="w-full text-[11px] file:mr-3 file:py-2 file:px-3 file:rounded-lg file:border-0 file:text-[11px] file:font-bold file:uppercase file:tracking-wider file:bg-brand-primary file:text-white hover:file:bg-brand-accent hover:file:text-brand-primary file:cursor-pointer cursor-pointer"
-                />
-                {uploading && <p className="text-[10px] text-stone-400">Processing image...</p>}
-                {uploadError && <p className="text-[10px] text-red-500">{uploadError}</p>}
-                <input
-                  type="text"
-                  value={form.img}
-                  onChange={(e) => setForm({ ...form, img: e.target.value })}
-                  className="w-full bg-stone-50 border border-stone-200 rounded-xl px-4 py-2 text-xs focus:outline-none focus:border-brand-accent"
-                  placeholder="or paste an image URL"
-                />
-              </div>
-            </div>
+            ))}
           </div>
-          <div>
-            <label className="block text-xs font-semibold text-stone-700 mb-1 uppercase">
-              Description
-            </label>
-            <textarea
-              rows="3"
-              required
-              value={form.desc}
-              onChange={(e) => setForm({ ...form, desc: e.target.value })}
-              className="w-full bg-stone-50 border border-stone-200 rounded-xl px-4 py-2.5 text-xs focus:outline-none"
-              placeholder="Handcrafted luxury attire..."
-            />
-          </div>
-          <button
-            type="submit"
-            disabled={uploading}
-            className="w-full bg-brand-primary text-white py-3.5 rounded-xl font-bold uppercase tracking-widest text-xs hover:bg-brand-accent hover:text-brand-primary transition shadow-md disabled:opacity-60"
-          >
-            {uploading ? "Please wait..." : "Save Product"}
-          </button>
-        </form>
+        )}
       </div>
-    </div>
-    </ModalPortal>
+
+      <ProductModal open={modalOpen} onClose={() => setModalOpen(false)} editProduct={editProduct} />
+    </section>
   );
 }
